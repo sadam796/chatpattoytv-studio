@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Chatpattoytv Studio</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#10151f;color:white;font-family:Arial,sans-serif}
+header{padding:20px;background:#182231;text-align:center}
+h1{font-size:24px;color:#20e0a0;margin:5px}
+main{max-width:700px;margin:auto;padding:16px}
+.card{background:#1b2636;border-radius:15px;padding:16px;margin-bottom:16px}
+button,.upload{border:0;border-radius:9px;padding:13px;background:#19d6a0;color:#071a15;font-weight:bold;cursor:pointer}
+.modes{display:flex;gap:10px;margin:12px 0}
+.modes button{flex:1;background:#344257;color:white}
+.modes button.active{background:#19d6a0;color:#071a15}
+.upload{display:block;text-align:center;margin:12px 0}
+input[type=file]{max-width:100%;margin:12px 0}
+video{width:100%;max-height:350px;background:#05080c;border-radius:10px}
+small{color:#bac7d8}
+#clips button{margin:5px}
+#status{white-space:pre-wrap;color:#20e0a0}
+</style>
+</head>
+<body>
+<header>
+<h1>🎬 Chatpattoytv Studio</h1>
+<p>AI Video Editor • Made for RC Fans</p>
+</header>
+<main>
+<section class="card">
+<h3>🎥 1. Upload Your Videos</h3>
+<p>Select your RC video clips from your phone.</p>
+<input id="files" type="file" accept="video/*" multiple>
+<p><small>Tip: 30–40 minute videos may be slow on a phone. Start with short clips.</small></p>
+<div id="clips"></div>
+</section>
+
+<section class="card">
+<h3>✨ 2. Choose Editing Mode</h3>
+<div class="modes">
+<button id="natural" class="active">🌿 Natural</button>
+<button id="cinematic">🎬 Cinematic</button>
+</div>
+<p id="modeInfo">Natural mode: preserve the original RC sounds and natural look.</p>
+</section>
+
+<section class="card">
+<h3>▶️ 3. Preview Your Video</h3>
+<video id="preview" controls playsinline></video>
+<p id="filename">Choose a video clip to preview.</p>
+</section>
+
+<section class="card">
+<h3>✂️ 4. Basic Clip Tools</h3>
+<label>Start time (seconds)</label>
+<input id="start" type="number" min="0" value="0" style="width:100%;padding:10px;margin:8px 0">
+<label>End time (seconds)</label>
+<input id="end" type="number" min="1" value="10" style="width:100%;padding:10px;margin:8px 0">
+<button id="setTrim">Set Trim Range</button>
+<p id="trimInfo">Select a clip to begin.</p>
+</section>
+
+<section class="card">
+<h3>🚀 Editing Assistant</h3>
+<p>This first version lets you upload, preview and choose trim points. Automatic AI scene selection, bad-word muting, music mixing and final MP4 export are not implemented yet.</p>
+<p id="status">Ready. Select your video clips to begin.</p>
+</section>
+</main>
+
+<script>
+const fileInput=document.getElementById('files');
+const preview=document.getElementById('preview');
+const clips=document.getElementById('clips');
+const status=document.getElementById('status');
+let selectedFile=null;
+let videoURL=null;
+let mode='Natural';
+
+fileInput.addEventListener('change',()=>{
+  clips.innerHTML='';
+  const files=Array.from(fileInput.files||[]);
+  if(!files.length)return;
+  status.textContent=files.length+' clip(s) loaded. Tap a clip to preview.';
+  files.forEach((file)=>{
+    const b=document.createElement('button');
+    b.textContent=file.name;
+    b.style.display='block';
+    b.style.margin='8px 0';
+    b.style.maxWidth='100%';
+    b.style.overflowWrap='anywhere';
+    b.addEventListener('click',()=>{
+      selectedFile=file;
+      if(videoURL)URL.revokeObjectURL(videoURL);
+      videoURL=URL.createObjectURL(file);
+      preview.src=videoURL;
+      document.getElementById('filename').textContent=file.name;
+      document.getElementById('start').value=0;
+      document.getElementById('end').value=10;
+      document.getElementById('trimInfo').textContent=
+        'Clip selected. Duration: '+(isFinite(preview.duration)?preview.duration.toFixed(1)+' seconds':'loading...');
+      preview.onloadedmetadata=()=>{
+        document.getElementById('end').value=Math.floor(preview.duration);
+        document.getElementById('trimInfo').textContent=
+          'Duration: '+preview.duration.toFixed(1)+' seconds. Set your start and end points.';
+      };
+    });
+    clips.appendChild(b);
+  });
+});
+
+function setMode(newMode){
+  mode=newMode;
+  document.getElementById('natural').classList.toggle('active',mode==='Natural');
+  document.getElementById('cinematic').classList.toggle('active',mode==='Cinematic');
+  document.getElementById('modeInfo').textContent=mode==='Natural'
+    ?'Natural mode selected: preserve original colours and RC sounds.'
+    :'Cinematic mode selected: plan for dramatic cuts, colour grading and music in a future version.';
+}
+document.getElementById('natural').onclick=()=>setMode('Natural');
+document.getElementById('cinematic').onclick=()=>setMode('Cinematic');
+
+document.getElementById('setTrim').onclick=()=>{
+  if(!selectedFile||!preview.src){
+    document.getElementById('trimInfo').textContent='First select a video clip.';
+    return;
+  }
+  const start=Number(document.getElementById('start').value);
+  const end=Number(document.getElementById('end').value);
+  if(start<0||end<=start||end>preview.duration){
+    document.getElementById('trimInfo').textContent='Please enter valid times within the video duration.';
+    return;
+  }
+  preview.currentTime=start;
+  preview.ontimeupdate=()=>{
+    if(preview.currentTime>=end){
+      preview.pause();
+      preview.ontimeupdate=null;
+    }
+  };
+  document.getElementById('trimInfo').textContent=
+    'Preview range set: '+start+'s to '+end+'s. This sets preview points only; it does not export a trimmed video yet.';
+};
+</script>
+</body>
+</html>
