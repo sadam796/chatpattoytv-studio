@@ -1,5 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE html><html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -21,8 +20,12 @@ button:disabled{opacity:.45}
 video{width:100%;max-height:360px;background:#000;border-radius:10px;margin-top:12px}
 small,.hint{color:#c2c5da;line-height:1.5}
 #status{padding:12px;background:#282b3e;border-radius:8px;white-space:pre-wrap;overflow-wrap:anywhere}
-#download{display:none;text-align:center;display:none;padding:12px;background:#263e32;border-radius:8px;color:#9bffc0}
+#download{display:none;text-align:center;padding:12px;background:#263e32;border-radius:8px;color:#9bffc0;margin-top:12px}
 .row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+#cliplist{padding-left:22px}
+#cliplist li{margin:12px 0;overflow-wrap:anywhere}
+.clipbuttons{display:flex;gap:6px}
+.clipbuttons button{font-size:13px;padding:9px}
 @media(max-width:500px){.row{grid-template-columns:1fr}}
 </style>
 </head>
@@ -30,21 +33,18 @@ small,.hint{color:#c2c5da;line-height:1.5}
 <header>
 <h1>🎬 Chatpattoytv Studio</h1>
 <p>Trim • Merge • Slow Motion • Music • HD Export</p>
-</header>
-
-<main>
+</header><main>
 <section class="card">
 <h2>1. Select Videos</h2>
 <label for="videos">Choose one or multiple videos</label>
 <input id="videos" type="file" accept="video/*" multiple>
-<p class="hint">Multiple videos ko select karke ek MP4 banayein. Phone par pehle chhoti videos se test karein.</p>
+<p class="hint">Multiple clips select karke ek MP4 bana sakte hain.</p>
 <video id="preview" controls playsinline></video>
 <div id="fileinfo" class="hint"></div>
-</section>
-
-<section class="card">
+<ol id="cliplist"></ol>
+</section><section class="card">
 <h2>2. Trim Video</h2>
-<p class="hint">Selected har clip ke liye same start aur end time apply hoga.</p>
+<p class="hint">Sabhi clips par same start aur end time apply hoga. End time 0 ka matlab video ke aakhir tak.</p>
 <div class="row">
 <div>
 <label for="start">Start time (seconds)</label>
@@ -55,10 +55,8 @@ small,.hint{color:#c2c5da;line-height:1.5}
 <input id="end" type="number" min="0" step="0.1" value="0">
 </div>
 </div>
-</section>
-
-<section class="card">
-<h2>3. Speed & Cinematic Effects</h2>
+</section><section class="card">
+<h2>3. Speed & Effects</h2>
 <label for="speed">Playback speed</label>
 <select id="speed">
 <option value="1">Normal — 1×</option>
@@ -66,56 +64,48 @@ small,.hint{color:#c2c5da;line-height:1.5}
 <option value="0.5">Slow Motion — 0.5×</option>
 <option value="0.25">Super Slow — 0.25×</option>
 <option value="1.5">Fast — 1.5×</option>
-</select>
-
-<label for="fade">Cinematic fade effect</label>
+<option value="2">Very Fast — 2×</option>
+</select><label for="fade">Fade-in effect</label>
 <select id="fade">
+
 <option value="off">Off</option>
-<option value="on">Fade in and fade out on final video</option>
-</select>
-
-<label for="resolution">Export resolution</label>
+<option value="on">Fade in first second</option>
+</select><label for="resolution">Export resolution</label>
 <select id="resolution">
+
 <option value="original">Original resolution</option>
-<option value="1080">1080p HD</option>
-<option value="720">720p HD</option>
+<option value="1080">1080p HD (landscape maximum)</option>
+<option value="720">720p HD (landscape maximum)</option>
 </select>
-</section>
-
-<section class="card">
-<h2>4. Background Music & Sound</h2>
-<label for="music">Choose background music (MP3, WAV, etc.)</label>
-<input id="music" type="file" accept="audio/*">
-
-<label for="originalVolume">Original video sound: <span id="ov">100%</span></label>
+</section><section class="card">
+<h2>4. Background Music</h2>
+<label for="music">Choose music (optional)</label>
+<input id="music" type="file" accept="audio/*"><label for="originalVolume">Original video sound: <span id="ov">100%</span></label>
 <input id="originalVolume" type="range" min="0" max="100" value="100">
 
 <label for="musicVolume">Background music: <span id="mv">30%</span></label>
 <input id="musicVolume" type="range" min="0" max="100" value="30">
-<p class="hint">Music optional hai. Music select nahi karoge to original video sound hi rahega.</p>
-</section>
 
-<section class="card">
+<p class="hint">Music nahi select karoge to original sound rakha jayega.</p>
+</section><section class="card">
 <h2>5. Export MP4</h2>
 <button id="load">Load Video Engine</button>
 <button id="export" disabled>Export Edited MP4</button>
 <div id="status">Pehle video select karein, phir video engine load karein.</div>
-<a id="download">⬇ Download Edited MP4</a>
-</section>
-
-<p class="hint">Processing phone ke browser mein hoti hai. Large videos ko process karne mein time aur memory lag sakti hai.</p>
-</main>
-
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
-<script>
+<a id="download" download="chatpattoytv-edited.mp4">⬇ Download Edited MP4</a>
+</section><p class="hint">Phone par pehle 5–10 second ki chhoti video test karein. Export ke dauran browser band na karein. Sirf wahi videos use karein jinhe edit karne ka aapko adhikar hai.</p>
+</main><script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script><script>
 const $ = id => document.getElementById(id);
 let ffmpeg = null;
 let ready = false;
 let busy = false;
 let previewURL = null;
-let musicURL = null;
+let outputURL = null;
+let selectedFiles = [];
 
-const setStatus = msg => $("status").textContent = msg;
+const setStatus = message => {
+  $("status").textContent = message;
+};
 
 $("originalVolume").addEventListener("input", () => {
   $("ov").textContent = $("originalVolume").value + "%";
@@ -124,95 +114,151 @@ $("musicVolume").addEventListener("input", () => {
   $("mv").textContent = $("musicVolume").value + "%";
 });
 
+function refreshClipList() {
+  const list = $("cliplist");
+  list.replaceChildren();
+
+  selectedFiles.forEach((file, index) => {
+    const li = document.createElement("li");
+    li.appendChild(document.createTextNode(file.name));
+
+    const buttons = document.createElement("div");
+    buttons.className = "clipbuttons";
+
+    const previewBtn = document.createElement("button");
+    previewBtn.textContent = "Preview";
+    previewBtn.type = "button";
+    previewBtn.onclick = () => {
+      if (previewURL) URL.revokeObjectURL(previewURL);
+      previewURL = URL.createObjectURL(file);
+      $("preview").src = previewURL;
+      $("preview").load();
+    };
+    buttons.appendChild(previewBtn);
+
+    const up = document.createElement("button");
+    up.textContent = "↑ Move up";
+    up.type = "button";
+    up.disabled = index === 0;
+    up.onclick = () => {
+      [selectedFiles[index - 1], selectedFiles[index]] =
+        [selectedFiles[index], selectedFiles[index - 1]];
+      refreshClipList();
+    };
+    buttons.appendChild(up);
+
+    const down = document.createElement("button");
+    down.textContent = "↓ Move down";
+    down.type = "button";
+    down.disabled = index === selectedFiles.length - 1;
+    down.onclick = () => {
+      [selectedFiles[index + 1], selectedFiles[index]] =
+        [selectedFiles[index], selectedFiles[index + 1]];
+      refreshClipList();
+    };
+    buttons.appendChild(down);
+
+    li.appendChild(buttons);
+    list.appendChild(li);
+  });
+}
+
 $("videos").addEventListener("change", () => {
-  const files = [...$("videos").files];
-  $("fileinfo").textContent = files.length
-    ? files.length + " video(s) selected: " + files.map(f => f.name).join(", ")
-    : "";
+  selectedFiles = Array.from($("videos").files || []);
+  $("fileinfo").textContent = selectedFiles.length
+    ? selectedFiles.length + " video(s) selected"
+    : "No videos selected";
+
   if (previewURL) URL.revokeObjectURL(previewURL);
-  if (files[0]) {
-    previewURL = URL.createObjectURL(files[0]);
+  previewURL = null;
+
+  if (selectedFiles[0]) {
+    previewURL = URL.createObjectURL(selectedFiles[0]);
     $("preview").src = previewURL;
+  } else {
+    $("preview").removeAttribute("src");
   }
-  $("export").disabled = !ready || files.length === 0 || busy;
+
+  refreshClipList();
+  $("export").disabled = !ready || selectedFiles.length === 0 || busy;
   $("download").style.display = "none";
 });
 
-$("music").addEventListener("change", () => {
-  if (musicURL) URL.revokeObjectURL(musicURL);
-  if ($("music").files[0]) {
-    musicURL = URL.createObjectURL($("music").files[0]);
-  }
-});
+function makeSafeExtension(filename, fallback) {
+  const ext = (filename.split(".").pop() || fallback)
+    .replace(/[^a-zA-Z0-9]/g, "").slice(0, 8);
+  return ext || fallback;
+}
+
+async function runFF(args) {
+  ffmpeg.setProgress(({ ratio }) => {
+    if (Number.isFinite(ratio)) {
+      const percent = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+      setStatus("Video process ho rahi hai: " + percent + "%");
+    }
+  });
+
+  // Wait until the current FFmpeg command has finished.
+  await ffmpeg.run(...args);
+}
 
 $("load").addEventListener("click", async () => {
   if (busy) return;
+
   if (typeof FFmpeg === "undefined") {
     setStatus("FFmpeg library load nahi hui. Internet check karke page refresh karein.");
     return;
   }
+
   busy = true;
   $("load").disabled = true;
+  $("export").disabled = true;
   setStatus("Video engine load ho raha hai. Pehli baar kuch minute lag sakte hain...");
+
   try {
     const { createFFmpeg } = FFmpeg;
     ffmpeg = createFFmpeg({
       log: false,
       corePath: "https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js"
     });
+
     await ffmpeg.load();
     ready = true;
     setStatus("✅ Video engine ready! Ab Export Edited MP4 dabayein.");
-  } catch (e) {
+  } catch (error) {
     ffmpeg = null;
     ready = false;
-    setStatus("Engine load error: " + (e.message || e));
+    setStatus("Engine load error: " + (error.message || error));
   } finally {
     busy = false;
     $("load").disabled = false;
-    $("export").disabled = !ready || !$("videos").files.length;
+    $("export").disabled = !ready || selectedFiles.length === 0;
   }
 });
 
-function safeName(name) {
-  return name.replace(/[^a-zA-Z0-9._-]/g, "_").slice(-80) || "video.mp4";
-}
-
-function runFF(args) {
-  return new Promise((resolve, reject) => {
-    try {
-      ffmpeg.setProgress(({ ratio }) => {
-        if (Number.isFinite(ratio)) {
-          setStatus("Video process ho rahi hai: " +
-            Math.max(0, Math.min(100, Math.round(ratio * 100))) + "%");
-        }
-      });
-      ffmpeg.run(...args);
-      resolve();
-    } catch (e) {
-      reject(e);
-    }
-  });
+async function writeInput(filename, file) {
+  ffmpeg.FS("writeFile", filename, await fetchFile(file));
 }
 
 $("export").addEventListener("click", async () => {
-  const files = [...$("videos").files];
+  const files = selectedFiles.slice();
   if (!ready || !ffmpeg || !files.length || busy) return;
 
   const start = Number($("start").value);
   const end = Number($("end").value);
   const speed = Number($("speed").value);
-  const music = $("music").files[0];
-  const origVol = Number($("originalVolume").value) / 100;
-  const musicVol = Number($("musicVolume").value) / 100;
+  const music = $("music").files[0] || null;
+  const originalVolume = Number($("originalVolume").value) / 100;
+  const musicVolume = Number($("musicVolume").value) / 100;
   const resolution = $("resolution").value;
-  const useFade = $("fade").value === "on";
+  const fade = $("fade").value === "on";
 
   if (!Number.isFinite(start) || start < 0 ||
       !Number.isFinite(end) || end < 0 || speed <= 0) {
     setStatus("Trim time ya speed sahi nahi hai.");
     return;
   }
+
   if (end > 0 && end <= start) {
     setStatus("End time, start time se bada hona chahiye.");
     return;
@@ -222,115 +268,202 @@ $("export").addEventListener("click", async () => {
   $("export").disabled = true;
   $("load").disabled = true;
   $("download").style.display = "none";
-  const created = [];
+
+  const temporaryFiles = [];
 
   try {
-    setStatus("Videos process ho rahi hain. Browser ko band mat karein.");
+    setStatus("Export shuru ho raha hai... Browser ko khula rakhein.");
 
-    // Prepare each clip with consistent dimensions and frame rate.
     const clipNames = [];
+
     for (let i = 0; i < files.length; i++) {
-      const inputName = "input" + i + "." +
-        ((files[i].name.split(".").pop() || "mp4").replace(/[^a-zA-Z0-9]/g, "").slice(0, 8) || "mp4");
-      const clipName = "clip" + i + ".mp4";
-      ffmpeg.FS("writeFile", inputName, await fetchFile(files[i]));
-      created.push(inputName);
-      const args = ["-i", inputName];
+      const inputName = "input_" + i + "." +
+        makeSafeExtension(files[i].name, "mp4");
+      const clipName = "clip_" + i + ".mp4";
 
-      const filters = [];
+      await writeInput(inputName, files[i]);
+      temporaryFiles.push(inputName);
+
+      setStatus("Clip " + (i + 1) + "/" + files.length + " process ho rahi hai...");
+
+      const args = [];
+
       if (start > 0) args.push("-ss", String(start));
-      if (end > 0) args.push("-to", String(end));
 
-      let vf = "setpts=PTS/" + speed +
-        ",scale='if(gte(iw,ih)," +
-        (resolution === "1080" ? "1920" : resolution === "720" ? "1280" : "iw") +
-        ",-2)':'if(gte(iw,ih),-2," +
-        (resolution === "1080" ? "1920" : resolution === "720" ? "1280" : "ih") +
-        ")':force_original_aspect_ratio=decrease,pad=ceil(iw/2)*2:ceil(ih/2)*2,fps=30,format=yuv420p";
-      args.push("-vf", vf);
+      args.push("-i", inputName);
 
-      if (origVol === 0) {
-        args.push("-an");
-      } else {
-        args.push("-af", "volume=" + origVol + ",atempo=" +
-          (speed < 0.5 ? "0.5," : "") +
-          (speed > 2 ? "2," : "") + speed);
+      if (end > 0) {
+        args.push("-t", String(end - start));
       }
 
-      args.push("-c:v", "libx264", "-preset", "ultrafast",
-        "-crf", "23", "-c:a", "aac", "-ar", "44100",
-        "-ac", "2", "-shortest", clipName);
+      let scaleFilter = "scale=trunc(iw/2)*2:trunc(ih/2)*2";
+
+      if (resolution === "1080") {
+        scaleFilter =
+          "scale=1920:1080:force_original_aspect_ratio=decrease," +
+          "pad=ceil(iw/2)*2:ceil(ih/2)*2";
+      } else if (resolution === "720") {
+        scaleFilter =
+          "scale=1280:720:force_original_aspect_ratio=decrease," +
+          "pad=ceil(iw/2)*2:ceil(ih/2)*2";
+      }
+
+      const filters = [
+        "setpts=PTS/" + speed,
+        scaleFilter,
+        "fps=30",
+        "format=yuv420p"
+      ];
+
+      if (fade) {
+        filters.push("fade=t=in:st=0:d=1");
+      }
+
+      args.push("-vf", filters.join(","));
+
+      const audioFilters = [];
+      if (speed !== 1) {
+        let remaining = speed;
+        while (remaining < 0.5) {
+          audioFilters.push("atempo=0.5");
+          remaining /= 0.5;
+        }
+        while (remaining > 2) {
+          audioFilters.push("atempo=2");
+          remaining /= 2;
+        }
+        audioFilters.push("atempo=" + remaining);
+      }
+      audioFilters.push("volume=" + originalVolume);
+
+      if (originalVolume === 0) {
+        args.push("-an");
+      } else {
+        args.push("-af", audioFilters.join(","));
+      }
+
+      args.push(
+        "-c:v", "libx264",
+        "-preset", "ultrafast",
+        "-crf", "23",
+        "-c:a", "aac",
+        "-ar", "44100",
+        "-ac", "2",
+        "-pix_fmt", "yuv420p",
+        clipName
+      );
+
       await runFF(args);
       clipNames.push(clipName);
-      created.push(clipName);
+      temporaryFiles.push(clipName);
     }
 
-    // Join clips in the selected order.
     let finalInput = clipNames[0];
+
     if (clipNames.length > 1) {
-      const listText = clipNames.map(n => "file '" + n + "'").join("\n");
-      ffmpeg.FS("writeFile", "concat.txt", new TextEncoder().encode(listText));
-      created.push("concat.txt");
-      await runFF(["-f", "concat", "-safe", "0", "-i", "concat.txt",
-        "-c", "copy", "joined.mp4"]);
+      const listName = "concat_list.txt";
+      const listText = clipNames.map(name => "file '" + name + "'").join("\n");
+      ffmpeg.FS("writeFile", listName, new TextEncoder().encode(listText));
+      temporaryFiles.push(listName);
+
+      setStatus("Clips merge ho rahi hain...");
+      await runFF([
+        "-f", "concat",
+        "-safe", "0",
+        "-i", listName,
+        "-c", "copy",
+        "joined.mp4"
+      ]);
+
       finalInput = "joined.mp4";
-      created.push("joined.mp4");
+      temporaryFiles.push(finalInput);
     }
 
     const finalArgs = ["-i", finalInput];
-    if (music) {
+
+    if (music && musicVolume > 0) {
       const musicName = "background_music." +
-        ((music.name.split(".").pop() || "mp3").replace(/[^a-zA-Z0-9]/g, "").slice(0, 8) || "mp3");
-      ffmpeg.FS("writeFile", musicName, await fetchFile(music));
-      created.push(musicName);
+        makeSafeExtension(music.name, "mp3");
+
+      await writeInput(musicName, music);
+      temporaryFiles.push(musicName);
+
       finalArgs.push("-i", musicName);
-      finalArgs.push("-filter_complex",
-        "[0:a]volume=" + origVol + "[a0];" +
-        "[1:a]volume=" + musicVol + "[a1];" +
-        "[a0][a1]amix=inputs=2:duration=first:dropout_transition=2[aout]");
-      finalArgs.push("-map", "0:v", "-map", "[aout]");
+
+      const hasOriginalAudio = originalVolume > 0;
+      let audioMap;
+
+      if (hasOriginalAudio) {
+        finalArgs.push(
+          "-filter_complex",
+          "[0:a]volume=" + originalVolume + "[original];" +
+          "[1:a]volume=" + musicVolume + "[music];" +
+          "[original][music]amix=inputs=2:duration=first:dropout_transition=2[aout]"
+        );
+        audioMap = "[aout]";
+      } else {
+        finalArgs.push(
+          "-filter_complex",
+          "[1:a]volume=" + musicVolume + "[aout]"
+        );
+        audioMap = "[aout]";
+      }
+
+      finalArgs.push("-map", "0:v:0", "-map", audioMap);
     } else {
-      finalArgs.push("-map", "0:v", "-map", "0:a?");
+      finalArgs.push("-map", "0:v:0", "-map", "0:a?");
     }
 
-    if (useFade) {
-      // Fade the image in and out; duration is based on output length.
-      // A short conservative fade-in is used for browser-side export.
-      finalArgs.push("-vf", "fade=t=in:st=0:d=1");
-    }
+    finalArgs.push(
+      "-c:v", "libx264",
+      "-preset", "ultrafast",
+      "-crf", "23",
+      "-c:a", "aac",
+      "-movflags", "+faststart",
+      "-shortest",
+      "edited_output.mp4"
+    );
 
-    finalArgs.push("-c:v", "libx264", "-preset", "ultrafast",
-      "-crf", "23", "-c:a", "aac", "-movflags", "+faststart",
-      "edited_output.mp4");
-
+    setStatus("Final MP4 ban rahi hai. Kripya intezar karein...");
     await runFF(finalArgs);
+
     const data = ffmpeg.FS("readFile", "edited_output.mp4");
-    const blob = new Blob([data.buffer], { type: "video/mp4" });
-    const url = URL.createObjectURL(blob);
+    const blob = new Blob([data], { type: "video/mp4" });
+
+    if (outputURL) URL.revokeObjectURL(outputURL);
+    outputURL = URL.createObjectURL(blob);
+
     const link = $("download");
-    link.href = url;
+    link.href = outputURL;
     link.download = "chatpattoytv-edited.mp4";
     link.style.display = "block";
-    link.textContent = "⬇ Download Edited MP4";
-    setStatus("✅ Export complete! Neeche download link dabayein.");
-  } catch (e) {
-    setStatus("Export error: " + (e.message || e) +
-      "\nChhoti video se dobara test karein. Agar source video mein audio nahi hai aur music mix kar rahe hain, to error aa sakta hai.");
+
+    setStatus("✅ Export complete! Neeche Download Edited MP4 dabayein.");
+  } catch (error) {
+    console.error(error);
+    setStatus(
+      "Export error: " + (error.message || error) +
+      "\nChhoti video se dobara test karein. Agar phir error aaye to uska screenshot ya poora message bhejein."
+    );
   } finally {
-    // Free temporary files to reduce memory use.
-    for (const name of created) {
-      try { ffmpeg.FS("unlink", name); } catch (_) {}
+    for (const filename of temporaryFiles) {
+      try {
+        ffmpeg.FS("unlink", filename);
+      } catch (_) {}
     }
-    try { ffmpeg.FS("unlink", "edited_output.mp4"); } catch (_) {}
+
+    try {
+      ffmpeg.FS("unlink", "edited_output.mp4");
+    } catch (_) {}
+
     busy = false;
     $("load").disabled = false;
-    $("export").disabled = !ready || !$("videos").files.length;
+    $("export").disabled = !ready || selectedFiles.length === 0;
   }
 });
 
 async function fetchFile(file) {
   return new Uint8Array(await file.arrayBuffer());
 }
-</script>
-</body>
+</script></body>
 </html>
