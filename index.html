@@ -4,393 +4,372 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Chatpattoytv Studio</title>
-<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#0b1020;color:#fff;font-family:Arial,sans-serif}
-header{text-align:center;padding:22px 12px;background:#151d35}
-h1{margin:0;color:#72e5ff;font-size:26px}
-header p,.small{color:#b7c5df;font-size:13px;line-height:1.5}
-main{max-width:850px;margin:auto;padding:14px}
-.panel{background:#151d35;border:1px solid #293654;border-radius:14px;padding:15px;margin-bottom:15px}
-h2{font-size:19px;margin-top:0}
-button,.filelabel{display:inline-block;border:0;border-radius:9px;background:#3478f6;color:white;padding:12px 14px;margin:4px 2px;font-weight:bold;font-size:14px;cursor:pointer}
-button:disabled{opacity:.45}
-.secondary{background:#34415f}
-.danger{background:#b83248}
-input[type=file]{display:none}
-input[type=number],select{background:#0b1020;color:white;border:1px solid #405071;border-radius:7px;padding:9px;max-width:100%}
-label{display:block;margin:12px 0 6px;color:#dbe5ff}
-video{width:100%;max-height:360px;background:#000;border-radius:10px;margin-top:10px}
-.clip,.suggestion{padding:12px;background:#0e162b;border:1px solid #405071;border-radius:10px;margin:10px 0}
-.cliptitle{overflow-wrap:anywhere;font-weight:bold;margin-bottom:8px}
-.row{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
-#status{white-space:pre-wrap;overflow-wrap:anywhere;color:#8df0bd;margin-top:12px}
-progress{width:100%;margin-top:12px}
-footer{text-align:center;color:#8998b7;font-size:12px;padding:18px}
+body{margin:0;background:#10111b;color:#fff;font-family:Arial,sans-serif}
+header{text-align:center;padding:22px 12px;background:#191b2c}
+h1{color:#91a2ff;margin:0}
+header p,.hint{color:#c4c7dc;line-height:1.5}
+main{max-width:850px;margin:auto;padding:12px}
+.card{background:#1b1d2d;padding:17px;border:1px solid #383b52;border-radius:14px;margin:14px 0}
+h2{font-size:19px;color:#aab8ff}
+label{display:block;margin:13px 0 6px}
+input,select{width:100%;padding:11px;border-radius:8px;background:#292c40;color:white;border:1px solid #565b79}
+input[type=range]{padding:0}
+button{padding:11px;border:0;border-radius:8px;background:#687cff;color:white;font-weight:bold;cursor:pointer;margin:4px 0}
+button:disabled{opacity:.4}
+.full{width:100%}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+video{width:100%;max-height:350px;background:#000;margin-top:10px;border-radius:8px}
+.clip{background:#292c40;border-radius:9px;padding:12px;margin:10px 0}
+.clip strong{overflow-wrap:anywhere}
+.clip button{width:32%;font-size:12px}
+#status{white-space:pre-wrap;overflow-wrap:anywhere;background:#292c40;padding:12px;border-radius:8px}
+progress{width:100%;height:20px}
+a.download{display:block;background:#1f4934;color:#a9ffc7;text-align:center;padding:15px;border-radius:8px;margin-top:10px}
+@media(max-width:500px){.row{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
 <header>
 <h1>🎬 Chatpattoytv Studio</h1>
-<p>Multiple Clips • Smart Trim • MP4 Export</p>
+<p>Trim • Reorder • Merge • Slow Motion • Music • HD</p>
 </header>
 
 <main>
-<section class="panel">
-<h2>📂 1. Add Videos</h2>
-<label class="filelabel" for="videos">+ Select Multiple Videos</label>
+<section class="card">
+<h2>1. Select Videos</h2>
 <input id="videos" type="file" accept="video/*" multiple>
-<p class="small">Pehle chhoti videos se test karo. Badi 4K files par phone ki memory aur speed limit ho sakti hai.</p>
+<p class="hint">Multiple clips select kar sakte ho. Har clip ka trim aur order neeche set karo.</p>
+<video id="preview" controls playsinline></video>
 <div id="clips"></div>
 </section>
 
-<section class="panel">
-<h2>👀 2. Preview</h2>
-<video id="preview" controls playsinline></video>
-<p class="small">Clip select karke preview dekho.</p>
-</section>
-
-<section class="panel">
-<h2>🤖 3. Smart Trim Assistant</h2>
-<p class="small">Ye feature video ke frames sample karke unmein visual changes ka andaza lagata hai. Kam movement wale segments ko review ke liye suggest karega. Ye advanced AI scene understanding nahi hai.</p>
-<label for="sampleStep">Analysis interval</label>
-<select id="sampleStep">
-<option value="2">Har 2 second (zyada samples)</option>
-<option value="4" selected>Har 4 second</option>
-<option value="6">Har 6 second (faster)</option>
+<section class="card">
+<h2>2. Video Settings</h2>
+<div class="row">
+<div>
+<label for="speed">Playback Speed</label>
+<select id="speed">
+<option value="1">Normal 1×</option>
+<option value="0.75">Slow 0.75×</option>
+<option value="0.5">Slow Motion 0.5×</option>
+<option value="0.25">Super Slow 0.25×</option>
+<option value="1.5">Fast 1.5×</option>
+<option value="2">Fast 2×</option>
 </select>
-<button id="analyze">🔎 Analyze Video Movement</button>
-<div id="suggestions"></div>
-</section>
-
-<section class="panel">
-<h2>⚙️ 4. Export Settings</h2>
-<label for="resolution">Resolution</label>
+</div>
+<div>
+<label for="resolution">Export Resolution</label>
 <select id="resolution">
-<option value="720">720p HD</option>
-<option value="1080" selected>1080p Full HD</option>
-<option value="original">Original resolution</option>
+<option value="original">Original size</option>
+<option value="1080">1080p</option>
+<option value="720">720p</option>
 </select>
-<label for="quality">Video Quality</label>
-<select id="quality">
-<option value="18">High quality</option>
-<option value="23" selected>Balanced</option>
-<option value="28">Smaller file</option>
+</div>
+</div>
+<label for="fade">Cinematic Fade</label>
+<select id="fade">
+<option value="off">Off</option>
+<option value="on">Fade in and fade out</option>
 </select>
-<label for="fps">Frame Rate</label>
-<select id="fps">
-<option value="30" selected>30 FPS</option>
-<option value="60">60 FPS</option>
-<option value="original">Keep source frame rate</option>
-</select>
-<button id="load">Load Video Engine</button>
-<button id="export">🎬 Merge & Export MP4</button>
-<button id="clear" class="danger">Clear All</button>
-<progress id="progress" max="100" value="0"></progress>
-<div id="status">Ready. Videos select karo.</div>
-<div id="download"></div>
+<p class="hint">Fade option final video ke shuru aur end par fade lagata hai. Yeh clips ke beech true crossfade nahi hai.</p>
+</section>
+
+<section class="card">
+<h2>3. Background Music & Sound</h2>
+<label for="music">Background music file (optional)</label>
+<input id="music" type="file" accept="audio/*">
+
+<label for="originalVolume">Original sound: <span id="ov">100%</span></label>
+<input id="originalVolume" type="range" min="0" max="100" value="100">
+
+<label for="musicVolume">Music volume: <span id="mv">30%</span></label>
+<input id="musicVolume" type="range" min="0" max="100" value="30">
+</section>
+
+<section class="card">
+<h2>4. Export MP4</h2>
+<button class="full" id="load">Load Video Engine</button>
+<button class="full" id="export" disabled>Export Edited MP4</button>
+<progress id="progress" value="0" max="100"></progress>
+<div id="status">Pehle video select karo, phir engine load karo.</div>
+<div id="downloadArea"></div>
 </section>
 </main>
-<footer>Chatpattoytv Studio</footer>
 
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 <script>
-const {createFFmpeg,fetchFile}=FFmpeg;
-const ffmpeg=createFFmpeg({
- log:true,
- corePath:"https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js"
-});
-let engineReady=false;
-let clips=[];
-let previewURL=null;
-let outputURL=null;
-let suggestions=[];
+const $ = id => document.getElementById(id);
+let ffmpeg = null;
+let ready = false;
+let busy = false;
+let items = [];
+let previewURL = null;
 
-const $=id=>document.getElementById(id);
-function status(t){$("status").textContent=t}
-function sec(v){const n=Number(v);return Number.isFinite(n)&&n>=0?n:0}
+function status(s){$("status").textContent=s}
+function updateExport(){
+  $("export").disabled = !ready || !items.length || busy;
+}
+$("originalVolume").oninput=()=>{$("ov").textContent=$("originalVolume").value+"%"};
+$("musicVolume").oninput=()=>{$("mv").textContent=$("musicVolume").value+"%"};
 
-$("videos").addEventListener("change",e=>{
- for(const file of Array.from(e.target.files||[])){
-  if(file.type.startsWith("video/")){
-   clips.push({file,start:0,end:0,duration:0,id:Math.random().toString(36).slice(2)});
+$("videos").addEventListener("change",()=>{
+  items=[...$("videos").files].map((file,index)=>({
+    file,start:0,end:0,name:file.name,id:index
+  }));
+  renderClips();
+  $("downloadArea").innerHTML="";
+  if(previewURL)URL.revokeObjectURL(previewURL);
+  if(items[0]){
+    previewURL=URL.createObjectURL(items[0].file);
+    $("preview").src=previewURL;
   }
- }
- e.target.value="";
- renderClips();
+  updateExport();
 });
 
 function renderClips(){
- const box=$("clips");
- box.innerHTML="";
- if(!clips.length){
-  box.innerHTML='<p class="small">Abhi koi video select nahi ki.</p>';
-  return;
- }
- clips.forEach((c,i)=>{
-  const card=document.createElement("div");
-  card.className="clip";
-  const title=document.createElement("div");
-  title.className="cliptitle";
-  title.textContent=(i+1)+". "+c.file.name;
-  card.appendChild(title);
-  const size=document.createElement("p");
-  size.className="small";
-  size.textContent="File size: "+(c.file.size/1048576).toFixed(1)+" MB";
-  card.appendChild(size);
-  const preview=document.createElement("button");
-  preview.textContent="Preview";
-  preview.onclick=()=>showPreview(c);
-  card.appendChild(preview);
+  const box=$("clips");
+  box.innerHTML="";
+  items.forEach((item,index)=>{
+    const div=document.createElement("div");
+    div.className="clip";
+    const title=document.createElement("strong");
+    title.textContent=(index+1)+". "+item.name;
+    div.appendChild(title);
 
-  const sl=document.createElement("label");
-  sl.textContent="Start time (seconds)";
-  card.appendChild(sl);
-  const start=document.createElement("input");
-  start.type="number";start.min="0";start.step="0.1";start.value=c.start;
-  start.onchange=()=>{
-   c.start=sec(start.value);
-   if(c.end>0&&c.start>=c.end){c.start=Math.max(0,c.end-0.1);start.value=c.start}
-  };
-  card.appendChild(start);
+    const row=document.createElement("div");
+    row.className="row";
+    const a=document.createElement("div");
+    const la=document.createElement("label");
+    la.textContent="Start seconds";
+    const sa=document.createElement("input");
+    sa.type="number";sa.min="0";sa.step="0.1";sa.value=item.start;
+    sa.addEventListener("change",()=>{
+      item.start=Math.max(0,Number(sa.value)||0);
+    });
+    a.append(la,sa);
 
-  const el=document.createElement("label");
-  el.textContent="End time (seconds; 0 = full video)";
-  card.appendChild(el);
-  const end=document.createElement("input");
-  end.type="number";end.min="0";end.step="0.1";end.value=c.end;
-  end.onchange=()=>{
-   c.end=sec(end.value);
-   if(c.duration&&c.end>c.duration){c.end=c.duration;end.value=c.end}
-   if(c.end>0&&c.end<=c.start){c.end=c.start+0.1;end.value=c.end}
-  };
-  card.appendChild(end);
+    const b=document.createElement("div");
+    const lb=document.createElement("label");
+    lb.textContent="End seconds (0 = end)";
+    const eb=document.createElement("input");
+    eb.type="number";eb.min="0";eb.step="0.1";eb.value=item.end;
+    eb.addEventListener("change",()=>{
+      item.end=Math.max(0,Number(eb.value)||0);
+    });
+    b.append(lb,eb);
+    row.append(a,b);
+    div.appendChild(row);
 
-  const row=document.createElement("div");row.className="row";
-  const up=document.createElement("button");up.className="secondary";up.textContent="↑ Up";up.disabled=i===0;
-  up.onclick=()=>{[clips[i-1],clips[i]]=[clips[i],clips[i-1]];renderClips()};
-  row.appendChild(up);
-  const down=document.createElement("button");down.className="secondary";down.textContent="↓ Down";down.disabled=i===clips.length-1;
-  down.onclick=()=>{[clips[i+1],clips[i]]=[clips[i],clips[i+1]];renderClips()};
-  row.appendChild(down);
-  const remove=document.createElement("button");remove.className="danger";remove.textContent="Remove";
-  remove.onclick=()=>{clips=clips.filter(x=>x.id!==c.id);renderClips();renderSuggestions()};
-  row.appendChild(remove);
-  card.appendChild(row);box.appendChild(card);
-
-  if(!c.duration){
-   const u=URL.createObjectURL(c.file);
-   const v=document.createElement("video");
-   v.preload="metadata";
-   v.onloadedmetadata=()=>{
-    c.duration=v.duration||0;
-    if(!c.end)c.end=c.duration;
-    URL.revokeObjectURL(u);
-    renderClips();
-   };
-   v.onerror=()=>URL.revokeObjectURL(u);
-   v.src=u;
-  }
- });
-}
-
-function showPreview(c){
- if(previewURL)URL.revokeObjectURL(previewURL);
- previewURL=URL.createObjectURL(c.file);
- $("preview").src=previewURL;
- $("preview").load();
-}
-
-$("load").onclick=async()=>{
- if(engineReady){status("Video engine pehle se ready hai.");return}
- $("load").disabled=true;
- status("Video engine load ho raha hai. Internet on rakho.");
- try{
-  await ffmpeg.load();
-  engineReady=true;
-  status("Video engine ready! Ab export kar sakte ho.");
- }catch(e){
-  console.error(e);
-  status("Engine load fail hua: "+e.message+"\nInternet check karke reload karo.");
- }finally{$("load").disabled=false}
-};
-
-// Smart Trim: browser-side visual-change estimate using sampled video frames.
-// It suggests segments; it does not automatically delete or modify clips.
-async function analyzeClip(c,index,step){
- const url=URL.createObjectURL(c.file);
- const v=document.createElement("video");
- v.muted=true;v.preload="auto";v.src=url;
- await new Promise((resolve,reject)=>{
-  v.onloadedmetadata=resolve;
-  v.onerror=()=>reject(new Error("Video metadata read nahi ho saka: "+c.file.name));
- });
- const duration=v.duration||c.duration;
- if(!duration){URL.revokeObjectURL(url);return []}
-
- const canvas=document.createElement("canvas");
- canvas.width=64;canvas.height=36;
- const ctx=canvas.getContext("2d",{willReadFrequently:true});
- const samples=[];
- const maxSamples=Math.min(180,Math.ceil(duration/step));
- for(let i=0;i<maxSamples;i++){
-  const t=Math.min(duration-0.05,i*step+0.1);
-  if(t<0)continue;
-  await new Promise((resolve,reject)=>{
-   v.onseeked=resolve;
-   v.onerror=()=>reject(new Error("Frame read fail"));
-   v.currentTime=t;
+    const up=document.createElement("button");
+    up.textContent="⬆ Up";
+    up.disabled=index===0;
+    up.onclick=()=>{
+      [items[index-1],items[index]]=[items[index],items[index-1]];
+      renderClips();
+    };
+    const down=document.createElement("button");
+    down.textContent="⬇ Down";
+    down.disabled=index===items.length-1;
+    down.onclick=()=>{
+      [items[index+1],items[index]]=[items[index],items[index+1]];
+      renderClips();
+    };
+    const pv=document.createElement("button");
+    pv.textContent="▶ Preview";
+    pv.onclick=()=>{
+      if(previewURL)URL.revokeObjectURL(previewURL);
+      previewURL=URL.createObjectURL(item.file);
+      $("preview").src=previewURL;
+      $("preview").currentTime=item.start||0;
+      $("preview").play().catch(()=>{});
+    };
+    div.append(up,down,pv);
+    box.appendChild(div);
   });
-  ctx.drawImage(v,0,0,canvas.width,canvas.height);
-  const pixels=ctx.getImageData(0,0,canvas.width,canvas.height).data;
-  const gray=new Uint8Array(canvas.width*canvas.height);
-  for(let p=0,j=0;p<pixels.length;p+=4,j++){
-   gray[j]=Math.round((pixels[p]*3+pixels[p+1]*6+pixels[p+2])/10);
-  }
-  let diff=0;
-  if(samples.length){
-   const prev=samples[samples.length-1].gray;
-   for(let j=0;j<gray.length;j++)diff+=Math.abs(gray[j]-prev[j]);
-   diff/=gray.length;
-  }
-  samples.push({time:t,gray,diff});
-  status("Analyzing clip "+(index+1)+": sample "+(i+1)+"/"+maxSamples);
- }
- URL.revokeObjectURL(url);
-
- // This is only a low visual-change heuristic, not semantic AI.
- const values=samples.slice(1).map(s=>s.diff).filter(Number.isFinite).sort((a,b)=>a-b);
- const threshold=values.length?Math.max(1.8,values[Math.floor(values.length*0.25)]):1.8;
- const low=[];
- for(let i=1;i<samples.length;i++){
-  if(samples[i].diff<threshold){
-   low.push({start:samples[i-1].time,end:samples[i].time+step});
-  }
- }
- // Combine adjacent low-change intervals and keep suggestions at least 4 sec.
- const merged=[];
- for(const s of low){
-  const last=merged[merged.length-1];
-  if(last&&s.start<=last.end+step*0.2)last.end=s.end;
-  else merged.push({start:s.start,end:s.end});
- }
- return merged
-  .filter(s=>s.end-s.start>=Math.max(4,step*1.5))
-  .map(s=>({
-   clipId:c.id,clipName:c.file.name,
-   start:Math.max(0,s.start),end:Math.min(duration,s.end),
-   duration:Math.min(duration,s.end)-Math.max(0,s.start)
-  }));
 }
 
-$("analyze").onclick=async()=>{
- if(!clips.length){status("Pehle video select karo.");return}
- $("analyze").disabled=true;
- $("suggestions").innerHTML="";
- suggestions=[];
- try{
-  const step=Number($("sampleStep").value);
-  for(let i=0;i<clips.length;i++){
-   const found=await analyzeClip(clips[i],i,step);
-   suggestions.push(...found);
+$("load").addEventListener("click",async()=>{
+  if(busy)return;
+  if(typeof FFmpeg==="undefined"){
+    status("FFmpeg library load nahi hui. Internet check karke page refresh karo.");
+    return;
   }
-  renderSuggestions();
-  status(suggestions.length
-   ?"Analysis complete. Suggestions review karo; koi cut automatic apply nahi hua."
-   :"Analysis complete. Koi clear low-movement segment suggest nahi hua.");
- }catch(e){
-  console.error(e);
-  status("Analysis fail hua: "+e.message+"\nChhoti video se dobara try karo.");
- }finally{$("analyze").disabled=false}
-};
+  busy=true;
+  $("load").disabled=true;
+  status("Video engine load ho raha hai...");
+  try{
+    ffmpeg=FFmpeg.createFFmpeg({
+      log:false,
+      corePath:"https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js"
+    });
+    await ffmpeg.load();
+    ready=true;
+    status("✅ Video engine ready! Export kar sakte ho.");
+  }catch(e){
+    ready=false;
+    status("Engine error: "+(e.message||e));
+  }finally{
+    busy=false;
+    $("load").disabled=false;
+    updateExport();
+  }
+});
 
-function renderSuggestions(){
- const box=$("suggestions");box.innerHTML="";
- if(!suggestions.length){
-  box.innerHTML='<p class="small">Analysis ke baad suggestions yahan dikhengi.</p>';
-  return;
- }
- suggestions.forEach((s,i)=>{
-  const card=document.createElement("div");card.className="suggestion";
-  const p=document.createElement("p");p.textContent=s.clipName+" — "+s.start.toFixed(1)+"s se "+s.end.toFixed(1)+"s tak low visual change";card.appendChild(p);
-  const note=document.createElement("p");note.className="small";note.textContent="Suggested duration: "+s.duration.toFixed(1)+" seconds. Pehle preview karke decide karo.";card.appendChild(note);
-  const preview=document.createElement("button");preview.textContent="Preview clip";
-  preview.onclick=()=>{const c=clips.find(x=>x.id===s.clipId);if(c)showPreview(c);};
-  card.appendChild(preview);
-  const cut=document.createElement("button");cut.className="secondary";cut.textContent="Apply trim";
-  cut.onclick=()=>{
-   const c=clips.find(x=>x.id===s.clipId);
-   if(!c)return;
-   if(!confirm("Is clip ka trim "+s.start.toFixed(1)+"s se "+s.end.toFixed(1)+"s tak set karein?"))return;
-   c.start=s.start;c.end=s.end;renderClips();
-   status("Suggested trim apply hua. Export se pehle settings check karo.");
-  };
-  card.appendChild(cut);box.appendChild(card);
- });
+function run(args){
+  return new Promise((resolve,reject)=>{
+    try{
+      ffmpeg.setProgress(({ratio})=>{
+        if(Number.isFinite(ratio)){
+          const p=Math.max(0,Math.min(100,Math.round(ratio*100)));
+          $("progress").value=p;
+          status("Export processing: "+p+"%");
+        }
+      });
+      ffmpeg.run(...args);
+      resolve();
+    }catch(e){reject(e)}
+  });
 }
 
-$("export").onclick=async()=>{
- if(!clips.length){status("Pehle video select karo.");return}
- if(!engineReady){status("Pehle Load Video Engine dabao.");return}
- const btn=$("export");btn.disabled=true;$("download").innerHTML="";$("progress").value=0;
- try{
-  const names=[];
-  for(let i=0;i<clips.length;i++){
-   const c=clips[i],input="input_"+i+".mp4",output="segment_"+i+".mp4";
-   const start=sec(c.start),end=c.end>0?sec(c.end):c.duration;
-   if(c.duration&&(start>=end||end>c.duration+0.2))throw new Error("Clip "+(i+1)+" ka start/end check karo.");
-   status("Processing clip "+(i+1)+"/"+clips.length+": "+c.file.name);
-   ffmpeg.FS("writeFile",input,await fetchFile(c.file));
-   const args=["-ss",String(start),"-i",input];
-   if(end>start)args.push("-t",String(end-start));
-   const filters=[];
-   const res=$("resolution").value;
-   if(res==="720")filters.push("scale=-2:720");
-   if(res==="1080")filters.push("scale=-2:1080");
-   const fps=$("fps").value;
-   if(fps!=="original")filters.push("fps="+fps);
-   if(filters.length)args.push("-vf",filters.join(","));
-   args.push("-c:v","libx264","-preset","ultrafast","-crf",$("quality").value,
-    "-pix_fmt","yuv420p","-c:a","aac","-b:a","128k","-ar","44100","-ac","2",
-    "-avoid_negative_ts","make_zero","-movflags","+faststart",output);
-   await ffmpeg.run(...args);
-   names.push(output);
-   try{ffmpeg.FS("unlink",input)}catch(_){}
-   $("progress").value=Math.round((i+1)/(clips.length+1)*80);
-  }
-  let finalName=names[0];
-  if(names.length>1){
-   status("Clips merge ho rahi hain...");
-   ffmpeg.FS("writeFile","concat_list.txt",new TextEncoder().encode(names.map(n=>"file '"+n+"'").join("\n")));
-   await ffmpeg.run("-f","concat","-safe","0","-i","concat_list.txt","-c","copy","-movflags","+faststart","final_video.mp4");
-   finalName="final_video.mp4";
-  }
-  const data=ffmpeg.FS("readFile",finalName);
-  if(outputURL)URL.revokeObjectURL(outputURL);
-  outputURL=URL.createObjectURL(new Blob([data],{type:"video/mp4"}));
-  const a=document.createElement("a");
-  a.href=outputURL;a.download="chatpattoytv-cinematic.mp4";
-  a.textContent="⬇ Download Edited MP4";a.className="filelabel";
-  $("download").appendChild(a);
-  $("progress").value=100;
-  status("Export complete! Download Edited MP4 dabao.");
- }catch(e){
-  console.error(e);
-  status("Export fail hua: "+e.message+"\nChhoti files se try karo.");
- }finally{btn.disabled=false}
-};
+function cleanName(name){
+  return name.replace(/[^a-zA-Z0-9._-]/g,"_").slice(-60)||"video.mp4";
+}
+async function writeFile(name,file){
+  ffmpeg.FS("writeFile",name,new Uint8Array(await file.arrayBuffer()));
+}
 
-$("clear").onclick=()=>{
- if(outputURL)URL.revokeObjectURL(outputURL);
- if(previewURL)URL.revokeObjectURL(previewURL);
- outputURL=null;previewURL=null;clips=[];suggestions=[];
- $("preview").removeAttribute("src");
- $("download").innerHTML="";$("suggestions").innerHTML="";$("progress").value=0;
- renderClips();renderSuggestions();status("Cleared. Naye videos select karo.");
-};
+$("export").addEventListener("click",async()=>{
+  if(!ready||busy||!items.length)return;
 
-renderClips();
-renderSuggestions();
+  for(const item of items){
+    if(item.end>0&&item.end<=item.start){
+      status("Error: "+item.name+" ka end time start time se bada hona chahiye.");
+      return;
+    }
+  }
+
+  busy=true;
+  updateExport();
+  $("load").disabled=true;
+  $("progress").value=0;
+  $("downloadArea").innerHTML="";
+  const temp=[];
+  const clips=[];
+
+  try{
+    const speed=Number($("speed").value);
+    const originalVolume=Number($("originalVolume").value)/100;
+    const musicVolume=Number($("musicVolume").value)/100;
+    const music=$("music").files[0];
+    const resolution=$("resolution").value;
+
+    for(let i=0;i<items.length;i++){
+      const item=items[i];
+      status("Clip "+(i+1)+"/"+items.length+" process ho raha hai...");
+      const input="source"+i+"."+cleanName(item.file.name).split(".").pop();
+      const output="clip"+i+".mp4";
+      await writeFile(input,item.file);
+      temp.push(input);
+
+      const args=[];
+      if(item.start>0)args.push("-ss",String(item.start));
+      if(item.end>0)args.push("-to",String(item.end));
+      args.push("-i",input);
+
+      let scale;
+      if(resolution==="1080"){
+        scale="scale=1920:1080:force_original_aspect_ratio=decrease";
+      }else if(resolution==="720"){
+        scale="scale=1280:720:force_original_aspect_ratio=decrease";
+      }else{
+        scale="scale=trunc(iw/2)*2:trunc(ih/2)*2";
+      }
+
+      let vf=scale+",setsar=1,fps=30,format=yuv420p,setpts=PTS/"+speed;
+      if($("fade").value==="on"){
+        vf+=",fade=t=in:st=0:d=0.5";
+      }
+      args.push("-vf",vf);
+
+      if(originalVolume===0){
+        args.push("-an");
+      }else{
+        args.push("-af","volume="+originalVolume);
+      }
+
+      args.push("-c:v","libx264","-preset","ultrafast","-crf","24");
+      if(originalVolume===0){
+        args.push("-an");
+      }else{
+        args.push("-c:a","aac","-ar","44100","-ac","2");
+      }
+      args.push("-threads","1",output);
+      await run(args);
+      temp.push(output);
+      clips.push(output);
+    }
+
+    let finalInput=clips[0];
+    if(clips.length>1){
+      status("Clips merge ho rahe hain...");
+      const list=clips.map(n=>"file '"+n+"'").join("\n");
+      ffmpeg.FS("writeFile","list.txt",new TextEncoder().encode(list));
+      temp.push("list.txt");
+      await run(["-f","concat","-safe","0","-i","list.txt","-c","copy","merged.mp4"]);
+      finalInput="merged.mp4";
+      temp.push(finalInput);
+    }
+
+    const args=["-i",finalInput];
+    if(music){
+      status("Background music add ho rahi hai...");
+      const mname="music."+cleanName(music.name).split(".").pop();
+      await writeFile(mname,music);
+      temp.push(mname);
+
+      // Source audio may be absent, so provide silence as a safe mix input.
+      args.push("-f","lavfi","-t","3600","-i","anullsrc=channel_layout=stereo:sample_rate=44100");
+      args.push("-i",mname);
+      args.push("-filter_complex",
+        "[0:a]volume="+originalVolume+"[orig];"+
+        "[1:a]volume=0[silence];"+
+        "[2:a]volume="+musicVolume+"[music];"+
+        "[orig][silence][music]amix=inputs=3:duration=first:dropout_transition=2[aout]");
+      args.push("-map","0:v","-map","[aout]");
+    }else{
+      args.push("-map","0:v","-map","0:a?");
+    }
+
+    args.push("-c:v","copy","-c:a","aac","-b:a","160k","-movflags","+faststart","final.mp4");
+    status("Final MP4 ban rahi hai...");
+    await run(args);
+
+    const data=ffmpeg.FS("readFile","final.mp4");
+    const blob=new Blob([data],{type:"video/mp4"});
+    const url=URL.createObjectURL(blob);
+    const link=document.createElement("a");
+    link.className="download";
+    link.href=url;
+    link.download="chatpattoytv-edited.mp4";
+    link.textContent="⬇ Download Edited MP4";
+    $("downloadArea").appendChild(link);
+    $("progress").value=100;
+    status("✅ Export complete! Download button dabao.");
+  }catch(e){
+    status("Export error: "+(e.message||e)+
+      "\nChhoti MP4 video se dobara test karo. Browser ko band mat karo.");
+  }finally{
+    for(const n of temp){
+      try{ffmpeg.FS("unlink",n)}catch(e){}
+    }
+    try{ffmpeg.FS("unlink","final.mp4")}catch(e){}
+    busy=false;
+    $("load").disabled=false;
+    updateExport();
+  }
+});
 </script>
 </body>
 </html>
