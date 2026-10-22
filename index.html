@@ -2,295 +2,296 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chatpattoytv Studio</title>
-
 <style>
 *{box-sizing:border-box}
-body{margin:0;background:#10151f;color:white;font-family:Arial,sans-serif}
-header{background:#182231;padding:20px;text-align:center}
-h1{color:#19d6a0;font-size:25px;margin:5px}
-main{max-width:750px;margin:auto;padding:14px}
-.card{background:#1b2636;border-radius:14px;padding:16px;margin-bottom:15px}
-h2{font-size:19px}
-p{color:#bac7d8;line-height:1.5}
-button{border:0;border-radius:9px;padding:12px;background:#19d6a0;color:#071a15;font-weight:bold;margin:4px;cursor:pointer}
-.secondary{background:#344257;color:white}
-input,select{padding:10px;border-radius:8px;background:#101925;color:white;border:1px solid #43546b;max-width:100%}
-input[type=file]{width:100%;margin:10px 0}
-video{width:100%;max-height:350px;background:#05080c;border-radius:10px}
-.clip{padding:12px;margin:10px 0;border:1px solid #43546b;border-radius:10px}
-.clip strong{overflow-wrap:anywhere}
-label{display:block;margin-top:12px;margin-bottom:5px}
-.row{display:flex;gap:8px;flex-wrap:wrap}
-.row>*{flex:1}
-#status{color:#19d6a0;white-space:pre-wrap}
-small{color:#bac7d8}
+body{margin:0;background:#10121a;color:#fff;font-family:Arial,sans-serif}
+header{padding:20px 15px;text-align:center;background:#191d2a;border-bottom:1px solid #34394b}
+h1{margin:0;color:#76e7ff;font-size:25px}
+header p{color:#bbc3d6;margin:8px 0 0;font-size:13px}
+main{max-width:760px;margin:auto;padding:15px}
+.card{background:#191d2a;border:1px solid #34394b;border-radius:14px;padding:16px;margin-bottom:15px}
+h2{font-size:18px;margin:0 0 14px;color:#76e7ff}
+label{display:block;margin:13px 0 7px;font-size:14px;color:#d8deeb}
+input[type=file],input[type=number],select,button{width:100%;padding:12px;border-radius:9px;border:1px solid #41485e;background:#252a3a;color:white;font-size:15px}
+input[type=range]{width:100%}
+video{width:100%;max-height:360px;background:#000;border-radius:10px;margin-top:12px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{background:#187cdb;border:0;font-weight:bold;margin-top:10px;cursor:pointer}
+button:disabled{opacity:.5}
+.secondary{background:#363c50}
+.export{background:#0b9c76;font-size:17px;padding:15px}
+#status{white-space:pre-wrap;line-height:1.5;font-size:14px;color:#bcebdc;margin-top:12px}
+#progress{width:100%;margin-top:10px}
+.note{font-size:12px;line-height:1.5;color:#aeb8cc}
+a{color:#76e7ff;overflow-wrap:anywhere}
+footer{text-align:center;color:#8790a5;font-size:12px;padding:15px}
 </style>
 </head>
-
 <body>
-
 <header>
-<h1>🎬 Chatpattoytv Studio</h1>
-<p>RC Video Editing Studio</p>
+  <h1>🎬 Chatpattoytv Studio</h1>
+  <p>Mobile Video Editor · MP4 Export</p>
 </header>
 
 <main>
+  <section class="card">
+    <h2>1. Upload Your Video</h2>
+    <input id="fileInput" type="file" accept="video/*">
+    <video id="preview" controls playsinline></video>
+    <p id="videoInfo" class="note">Choose a video to begin.</p>
+  </section>
 
-<div class="card">
-<h2>📂 1. Upload Videos</h2>
-<p>Ek lamba video ya multiple clips select karo.</p>
-<input id="files" type="file" accept="video/*" multiple>
-<div class="row">
-<button id="clear" class="secondary">Clear All</button>
-<button id="showCount" class="secondary">0 Clips</button>
-</div>
-<div id="clips"></div>
-</div>
+  <section class="card">
+    <h2>2. Trim Video</h2>
+    <div class="row">
+      <div>
+        <label for="start">Start time (seconds)</label>
+        <input id="start" type="number" min="0" step="0.1" value="0">
+      </div>
+      <div>
+        <label for="end">End time (seconds)</label>
+        <input id="end" type="number" min="0" step="0.1" value="10">
+      </div>
+    </div>
+    <p class="note">Example: Start 2 and End 8 exports approximately 6 seconds.</p>
+  </section>
 
-<div class="card">
-<h2>▶️ 2. Video Preview</h2>
-<video id="preview" controls playsinline></video>
-<p id="filename">Pehle video select karo.</p>
+  <section class="card">
+    <h2>3. Export Settings</h2>
+    <label for="resolution">Output resolution</label>
+    <select id="resolution">
+      <option value="720">720p HD — faster on phones</option>
+      <option value="1080" selected>1080p Full HD — recommended</option>
+      <option value="2160">4K — needs more memory and time</option>
+      <option value="original">Keep original dimensions</option>
+    </select>
 
-<div class="row">
-<div>
-<label for="start">Start (seconds)</label>
-<input id="start" type="number" min="0" value="0" step="0.1" style="width:100%">
-</div>
-<div>
-<label for="end">End (seconds)</label>
-<input id="end" type="number" min="0" value="10" step="0.1" style="width:100%">
-</div>
-</div>
+    <label for="quality">Video quality</label>
+    <select id="quality">
+      <option value="23">High quality — recommended</option>
+      <option value="18">Very high quality — larger file</option>
+      <option value="28">Smaller file</option>
+    </select>
 
-<button id="saveTrim">Save Trim Points</button>
-<p id="trimStatus">Abhi koi trim range select nahi hui.</p>
-</div>
+    <label for="fps">Frame rate</label>
+    <select id="fps">
+      <option value="original">Keep original frame rate</option>
+      <option value="30">30 FPS</option>
+      <option value="60">60 FPS</option>
+    </select>
 
-<div class="card">
-<h2>🎞️ 3. Editing Mode</h2>
-<div class="row">
-<button id="natural">🌿 Natural</button>
-<button id="cinematic" class="secondary">🎬 Cinematic</button>
-</div>
-<p id="modeInfo">Natural mode selected.</p>
-</div>
-
-<div class="card">
-<h2>📤 4. Export Settings</h2>
-
-<label for="resolution">Resolution</label>
-<select id="resolution" style="width:100%">
-<option value="1080">1080p Full HD</option>
-<option value="4k">4K UHD</option>
-</select>
-
-<label for="fps">Frame Rate</label>
-<select id="fps" style="width:100%">
-<option value="source">Match original video</option>
-<option value="30">30 FPS</option>
-<option value="60">60 FPS</option>
-</select>
-
-<label for="quality">Quality</label>
-<select id="quality" style="width:100%">
-<option value="high">High Quality</option>
-<option value="balanced">Balanced</option>
-</select>
-
-<p>⚠️ Ye abhi export preferences hain. Actual MP4 rendering aur download feature abhi implement nahi hua hai.</p>
-</div>
-
-<div class="card">
-<h2>🤖 5. AI Editing Assistant</h2>
-<p>Future upgrades: automatic scene selection, boring-part detection, audio cleanup, bad-word beep, background music, transitions aur MP4 export.</p>
-<p>Abhi ye AI features automatic kaam nahi karte.</p>
-<p id="status">Ready. Apna video upload karo.</p>
-</div>
-
+    <button id="exportBtn" class="export" disabled>⚡ Export MP4 & Download</button>
+    <progress id="progress" value="0" max="100" hidden></progress>
+    <div id="status">Upload a video to enable exporting.</div>
+    <p class="note">
+      Export runs on your device. Keep this page open and your phone awake.
+      Large videos may fail if the browser runs out of memory. 4K output does
+      not improve the detail of a lower-resolution original.
+    </p>
+  </section>
 </main>
 
+<footer>Chatpattoytv Studio · Browser-based video processing</footer>
+
+<script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
 <script>
-const fileInput=document.getElementById('files');
-const list=document.getElementById('clips');
-const preview=document.getElementById('preview');
-const status=document.getElementById('status');
+const fileInput = document.getElementById('fileInput');
+const preview = document.getElementById('preview');
+const videoInfo = document.getElementById('videoInfo');
+const startInput = document.getElementById('start');
+const endInput = document.getElementById('end');
+const exportBtn = document.getElementById('exportBtn');
+const statusBox = document.getElementById('status');
+const progress = document.getElementById('progress');
 
-let videos=[];
-let selected=-1;
-let videoURL=null;
+let selectedFile = null;
+let videoDuration = 0;
+let ffmpeg = null;
+let ffmpegLoading = false;
+let busy = false;
+let previewUrl = null;
 
-function updateList(){
- list.innerHTML='';
-
- videos.forEach((v,i)=>{
-  const box=document.createElement('div');
-  box.className='clip';
-
-  const title=document.createElement('strong');
-  title.textContent=(i+1)+'. '+v.file.name;
-
-  const info=document.createElement('p');
-  info.textContent='Duration: '+(v.duration?v.duration.toFixed(1)+' sec':'Loading')+
-  ' | Trim: '+v.start+' - '+(v.end===null?'end':v.end)+' sec';
-
-  const open=document.createElement('button');
-  open.textContent='Preview';
-  open.onclick=()=>selectVideo(i);
-
-  const up=document.createElement('button');
-  up.textContent='↑';
-  up.className='secondary';
-  up.disabled=i===0;
-  up.onclick=()=>moveVideo(i,-1);
-
-  const down=document.createElement('button');
-  down.textContent='↓';
-  down.className='secondary';
-  down.disabled=i===videos.length-1;
-  down.onclick=()=>moveVideo(i,1);
-
-  const remove=document.createElement('button');
-  remove.textContent='Remove';
-  remove.className='secondary';
-  remove.onclick=()=>removeVideo(i);
-
-  box.append(title,info,open,up,down,remove);
-  list.appendChild(box);
- });
-
- document.getElementById('showCount').textContent=videos.length+' Clips';
+function status(message) {
+  statusBox.textContent = message;
 }
 
-function selectVideo(i){
- selected=i;
- const v=videos[i];
-
- if(videoURL) URL.revokeObjectURL(videoURL);
- videoURL=URL.createObjectURL(v.file);
- preview.src=videoURL;
-
- document.getElementById('filename').textContent=v.file.name;
- document.getElementById('start').value=v.start;
- document.getElementById('end').value=v.end===null?10:v.end;
-
- preview.onloadedmetadata=()=>{
-  v.duration=preview.duration;
-  if(v.end===null||v.end>v.duration) v.end=v.duration;
-  document.getElementById('end').value=v.end;
-  updateList();
- };
-
- document.getElementById('trimStatus').textContent='Selected: '+v.file.name;
+function formatTime(seconds) {
+  if (!Number.isFinite(seconds)) return 'Unknown';
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return mins + 'm ' + secs + 's';
 }
 
-fileInput.addEventListener('change',()=>{
- const files=Array.from(fileInput.files||[]);
+fileInput.addEventListener('change', () => {
+  const file = fileInput.files && fileInput.files[0];
+  if (!file) return;
 
- files.forEach(file=>{
-  videos.push({file:file,start:0,end:null,duration:0});
- });
+  selectedFile = file;
+  exportBtn.disabled = true;
+  videoInfo.textContent = 'Loading video information…';
 
- updateList();
+  if (previewUrl) URL.revokeObjectURL(previewUrl);
+  previewUrl = URL.createObjectURL(file);
+  preview.src = previewUrl;
 
- if(files.length){
-  selectVideo(videos.length-files.length);
-  status.textContent=files.length+' video(s) added successfully.';
- }
+  preview.onloadedmetadata = () => {
+    videoDuration = preview.duration;
+    startInput.value = '0';
+    endInput.value = Number.isFinite(videoDuration)
+      ? videoDuration.toFixed(1) : '10';
 
- fileInput.value='';
+    videoInfo.textContent =
+      'File: ' + file.name +
+      ' | Size: ' + (file.size / (1024 * 1024)).toFixed(1) + ' MB' +
+      ' | Duration: ' + formatTime(videoDuration);
+
+    exportBtn.disabled = false;
+    status('Video ready. Set your trim points and tap Export MP4 & Download.');
+  };
+
+  preview.onerror = () => {
+    videoInfo.textContent = 'Preview could not load this file. Try a standard MP4 video.';
+    status('The browser could not preview this video. Try an MP4 file.');
+  };
 });
 
-function moveVideo(i,step){
- const j=i+step;
- if(j<0||j>=videos.length)return;
+async function getFFmpeg() {
+  if (ffmpeg && ffmpeg.isLoaded()) return ffmpeg;
 
- [videos[i],videos[j]]=[videos[j],videos[i]];
+  if (ffmpegLoading) {
+    throw new Error('FFmpeg is already loading. Please wait and try again.');
+  }
 
- if(selected===i)selected=j;
- else if(selected===j)selected=i;
+  if (!window.FFmpeg || !window.FFmpeg.createFFmpeg) {
+    throw new Error('FFmpeg library did not load. Check your internet connection, refresh the page, and try again.');
+  }
 
- updateList();
+  ffmpegLoading = true;
+  status('Loading video engine for the first time… Please wait.');
+
+  try {
+    const { createFFmpeg } = window.FFmpeg;
+    ffmpeg = createFFmpeg({
+      log: false,
+      corePath: 'https://unpkg.com/@ffmpeg/core@0.11.0/dist/ffmpeg-core.js',
+      progress: ({ ratio }) => {
+        if (Number.isFinite(ratio)) {
+          progress.value = Math.max(0, Math.min(100, Math.round(ratio * 100)));
+          status('Rendering MP4… ' + progress.value + '%\nKeep this page open.');
+        }
+      }
+    });
+
+    await ffmpeg.load();
+    return ffmpeg;
+  } finally {
+    ffmpegLoading = false;
+  }
 }
 
-function removeVideo(i){
- videos.splice(i,1);
-
- if(selected===i)selected=-1;
- else if(selected>i)selected--;
-
- if(selected===-1){
-  preview.removeAttribute('src');
-  preview.load();
-  document.getElementById('filename').textContent='Pehle video select karo.';
- }
-
- updateList();
- status.textContent='Video removed.';
+function safeFilename(name) {
+  return name.replace(/\.[^.]+$/, '').replace(/[^a-z0-9_-]/gi, '_').slice(0, 60) || 'video';
 }
 
-document.getElementById('clear').onclick=()=>{
- videos=[];
- selected=-1;
+exportBtn.addEventListener('click', async () => {
+  if (!selectedFile || busy) return;
 
- if(videoURL)URL.revokeObjectURL(videoURL);
- videoURL=null;
+  const start = Number(startInput.value);
+  const end = Number(endInput.value);
 
- preview.removeAttribute('src');
- preview.load();
+  if (!Number.isFinite(start) || !Number.isFinite(end) ||
+      start < 0 || end <= start) {
+    status('Please enter valid start and end times.');
+    return;
+  }
 
- updateList();
- status.textContent='All videos cleared.';
-};
+  if (Number.isFinite(videoDuration) && end > videoDuration + 0.2) {
+    status('End time is longer than the video. Please correct it.');
+    return;
+  }
 
-document.getElementById('saveTrim').onclick=()=>{
- if(selected<0){
-  document.getElementById('trimStatus').textContent='Pehle video select karo.';
-  return;
- }
+  if (selectedFile.size > 500 * 1024 * 1024) {
+    status('This video is over 500 MB. Mobile browser export may run out of memory. Try a shorter or smaller video.');
+    return;
+  }
 
- const start=Number(document.getElementById('start').value);
- const end=Number(document.getElementById('end').value);
- const v=videos[selected];
+  busy = true;
+  exportBtn.disabled = true;
+  progress.hidden = false;
+  progress.value = 0;
 
- if(start<0||end<=start||(v.duration&&end>v.duration)){
-  document.getElementById('trimStatus').textContent='Start aur end time check karo.';
-  return;
- }
+  const inputName = 'input_video';
+  const outputName = 'chatpattoytv_export.mp4';
 
- v.start=start;
- v.end=end;
+  try {
+    const engine = await getFFmpeg();
 
- updateList();
+    status('Preparing video file…');
+    engine.FS('writeFile', inputName, await window.FFmpeg.fetchFile(selectedFile));
 
- document.getElementById('trimStatus').textContent=
- 'Trim points saved: '+start+'s to '+end+'s. Original video abhi cut/export nahi hua.';
-};
+    const args = [
+      '-ss', String(start),
+      '-i', inputName,
+      '-t', String(end - start)
+    ];
 
-document.getElementById('natural').onclick=()=>{
- document.getElementById('modeInfo').textContent=
- 'Natural mode selected. Original look aur sound preserve karne ka target.';
-};
+    const resolution = document.getElementById('resolution').value;
+    if (resolution !== 'original') {
+      const height = Number(resolution);
+      args.push('-vf', 'scale=-2:' + height);
+    }
 
-document.getElementById('cinematic').onclick=()=>{
- document.getElementById('modeInfo').textContent=
- 'Cinematic mode selected. Colour grading, transitions aur music mixing abhi apply nahi hote.';
-};
+    const fps = document.getElementById('fps').value;
+    if (fps !== 'original') {
+      args.push('-r', fps);
+    }
 
-document.getElementById('resolution').onchange=()=>{
- status.textContent='Resolution preference: '+
- document.getElementById('resolution').selectedOptions[0].text+
- '. Abhi file render nahi hui.';
-};
+    const quality = document.getElementById('quality').value;
+    args.push(
+      '-c:v', 'libx264',
+      '-preset', 'ultrafast',
+      '-crf', quality,
+      '-c:a', 'aac',
+      '-b:a', '192k',
+      '-movflags', '+faststart',
+      '-y', outputName
+    );
 
-document.getElementById('fps').onchange=()=>{
- status.textContent='Frame rate preference: '+
- document.getElementById('fps').selectedOptions[0].text+
- '. Abhi file render nahi hui.';
-};
+    status('Rendering MP4… This may take a while on your phone.');
+    await engine.run(...args);
+
+    const data = engine.FS('readFile', outputName);
+    const blob = new Blob([data.buffer], { type: 'video/mp4' });
+    const downloadUrl = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+
+    link.href = downloadUrl;
+    link.download = safeFilename(selectedFile.name) + '_edited.mp4';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+    setTimeout(() => URL.revokeObjectURL(downloadUrl), 60000);
+
+    status('✅ MP4 export finished! Check your Downloads folder.\nIf the download did not start, try tapping Export again.');
+  } catch (error) {
+    console.error(error);
+    status('❌ Export failed:\n' + (error.message || String(error)) +
+      '\n\nTry refreshing the page, using a shorter video, or choosing 720p.');
+  } finally {
+    try {
+      if (ffmpeg && ffmpeg.isLoaded()) {
+        try { ffmpeg.FS('unlink', inputName); } catch (_) {}
+        try { ffmpeg.FS('unlink', outputName); } catch (_) {}
+      }
+    } catch (_) {}
+
+    busy = false;
+    exportBtn.disabled = !selectedFile;
+  }
+});
 </script>
-
 </body>
 </html>
